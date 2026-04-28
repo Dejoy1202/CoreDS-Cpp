@@ -1,0 +1,28 @@
+# Visual Studio 专属隐藏/缓存文件
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+# 编译输出目录
+Debug/
+Release/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+out/
+
+# 编译产物
+*.exe
+*.dll
+*.obj
+*.o
+*.pdb
+*.ilk
+*.lib
+*.exp
+
+# 临时文件
+*.tmp
+*.log
