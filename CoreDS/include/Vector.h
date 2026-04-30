@@ -121,6 +121,31 @@ namespace CoreDS {
 			}
 			return *this;
 		}
+
+		//清空函数
+		void clear() {
+			m_size = 0;
+		}
+
+		//迭代器实现
+		typedef T* iterator;
+		typedef const T* const_iterator;
+
+		iterator begin() {
+			return m_data;
+		}
+		
+		const_iterator begin() const {
+			return m_data;
+		}
+
+		iterator end() {
+			return m_data + m_size
+		}
+
+		const_iterator end() const {
+			return m_data + m_size
+		}
 	};
 
 
