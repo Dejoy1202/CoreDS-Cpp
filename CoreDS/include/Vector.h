@@ -140,11 +140,11 @@ namespace CoreDS {
 		}
 
 		iterator end() {
-			return m_data + m_size
+			return m_data + m_size;
 		}
 
 		const_iterator end() const {
-			return m_data + m_size
+			return m_data + m_size;
 		}
 	};
 
