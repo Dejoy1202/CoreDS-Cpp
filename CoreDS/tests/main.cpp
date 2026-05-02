@@ -4,6 +4,9 @@
 #include "Vector.h"
 #include "LinkedList.h"
 #include "DoublyLinkedList.h"
+#include "ArrayStack.h"
+#include "LinkedStack.h"
+
 
 void test_Vector() {
     // 1. 测试初始状态
@@ -88,7 +91,7 @@ void test_DoublyLinkedList() {
     assert(list.front() == 5);
     assert(list.back() == 20);
 
-    // 4. 尾部极速删除 (O(1) 斩首行动！)
+    // 4. 尾部极速删除
     list.pop_back();
     assert(list.size() == 2);
     assert(list.back() == 10); // 20被删了，现在尾巴变成了10
@@ -97,7 +100,7 @@ void test_DoublyLinkedList() {
     list.pop_front();
     assert(list.size() == 1);
     assert(list.front() == 10);
-    assert(list.back() == 10); // 独苗，头尾都是它
+    assert(list.back() == 10);
 
     // 6. 清空链表测试
     list.pop_front();
@@ -106,7 +109,7 @@ void test_DoublyLinkedList() {
     // 7. 异常拦截测试
     bool caught = false;
     try {
-        int boom = list.front(); // 空链表读取，应该爆炸
+        int boom = list.front();
     }
     catch (const std::out_of_range& e) {
         caught = true;
@@ -115,9 +118,78 @@ void test_DoublyLinkedList() {
 
     std::cout << "DoublyLinkedList 所有O(1)操作单元测试通过！\n";
 }
+
+void test_ArrayStack() {
+    // 传入较小的初始容量 2，强制在第三次 push 时触发底层的扩容逻辑
+    CoreDS::ArrayStack<int> stack(2);
+
+    // 1. 空栈异常测试
+    bool caught = false;
+    try {
+        stack.top();
+    }
+    catch (const std::out_of_range&) {
+        caught = true;
+    }
+    assert(caught);
+
+    // 2. 压栈与扩容测试
+    stack.push(10);
+    stack.push(20);
+    stack.push(30); // 此时应当触发扩容
+    assert(stack.top() == 30);
+
+    // 3. 出栈测试
+    stack.pop();
+    assert(stack.top() == 20);
+
+    // 4. 清空与越界出栈测试
+    stack.pop();
+    stack.pop();
+    caught = false;
+    try {
+        stack.pop();
+    }
+    catch (const std::out_of_range&) {
+        caught = true;
+    }
+    assert(caught);
+
+    std::cout << "ArrayStack 测试通过\n";
+}
+
+void test_LinkedStack() {
+    CoreDS::LinkedStack<int> stack;
+
+    // 1. 空栈异常测试
+    bool caught = false;
+    try { stack.top(); }
+    catch (const std::out_of_range&) { caught = true; }
+    assert(caught);
+
+    // 2. 压栈测试
+    stack.push(100);
+    stack.push(200);
+    assert(stack.top() == 200);
+
+    // 3. 出栈测试
+    stack.pop();
+    assert(stack.top() == 100);
+
+    // 4. 清空与越界出栈测试
+    stack.pop();
+    caught = false;
+    try { stack.pop(); }
+    catch (const std::out_of_range&) { caught = true; }
+    assert(caught);
+
+    std::cout << "LinkedStack 测试通过\n";
+}
 int main() {
     //test_Vector();
     //test_LinkedList();
-    test_DoublyLinkedList();
+    //test_DoublyLinkedList();
+   test_ArrayStack();
+   test_LinkedStack();
     return 0;
 }
