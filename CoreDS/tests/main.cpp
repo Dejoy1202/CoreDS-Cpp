@@ -6,6 +6,8 @@
 #include "DoublyLinkedList.h"
 #include "ArrayStack.h"
 #include "LinkedStack.h"
+#include "LinkedQueue.h"
+#include "ArrayQueue.h"
 
 
 void test_Vector() {
@@ -185,11 +187,87 @@ void test_LinkedStack() {
 
     std::cout << "LinkedStack 测试通过\n";
 }
+
+void test_LinkedQueue() {
+    CoreDS::LinkedQueue<int> queue;
+
+    // 1. 空队列异常拦截测试
+    bool caught = false;
+    try { queue.front(); }
+    catch (const std::out_of_range&) { caught = true; }
+    assert(caught);
+
+    // 2. 入队测试 (先进)
+    queue.enqueue(10);
+    queue.enqueue(20);
+    queue.enqueue(30);
+    assert(queue.front() == 10); // 队头应该是最早进来的 10
+    assert(queue.back() == 30);  // 队尾应该是最后进来的 30
+
+    // 3. 出队测试 (先出)
+    queue.dequeue();
+    assert(queue.front() == 20); // 10 走了，20 变成了新队头
+
+    // 4. 独苗与清空测试
+    queue.dequeue(); // 20 走
+    queue.dequeue(); // 30 走 (独苗分支触发)
+
+    caught = false;
+    try { queue.dequeue(); }
+    catch (const std::out_of_range&) { caught = true; }
+    assert(caught); // 再次出队应该爆炸
+
+    std::cout << "LinkedQueue (单链表队列) 测试完美通过！\n";
+}
+
+void test_ArrayQueue() {
+    // 初始容量给 2，强制触发扩容
+    CoreDS::ArrayQueue<int> queue(2);
+
+    // 1. 空队列异常拦截测试
+    bool caught = false;
+    try { queue.front(); }
+    catch (const std::out_of_range&) { caught = true; }
+    assert(caught);
+
+    // 2. 基本入队测试
+    queue.enqueue(10);
+    queue.enqueue(20);
+    assert(queue.front() == 10);
+    assert(queue.back() == 20);
+
+    // 3. 环形游标与扩容联合测试
+    // 先出一个，让 head 往后走，制造出环形状态
+    queue.dequeue();
+    // 此时队列里只有 20，head = 1, tail = 0 (如果没扩容的话)
+
+    // 再入队两个，强制触发扩容拉直逻辑
+    queue.enqueue(30);
+    queue.enqueue(40);
+
+    // 验证扩容后的顺序是否正确
+    assert(queue.front() == 20); // 队头依然是 20
+    assert(queue.back() == 40);  // 队尾是新来的 40
+
+    // 4. 清空测试
+    queue.dequeue(); // 出 20
+    queue.dequeue(); // 出 30
+    queue.dequeue(); // 出 40
+
+    caught = false;
+    try { queue.dequeue(); }
+    catch (const std::out_of_range&) { caught = true; }
+    assert(caught);
+
+    std::cout << "ArrayQueue (动态环形数组队列) 测试完美通过!\n";
+}
 int main() {
     //test_Vector();
     //test_LinkedList();
     //test_DoublyLinkedList();
-   test_ArrayStack();
-   test_LinkedStack();
+    //test_ArrayStack();
+    //test_LinkedStack();
+    //test_LinkedQueue();
+    test_ArrayQueue();
     return 0;
 }
