@@ -11,6 +11,7 @@
 #include "ArrayQueue.h"
 #include "BST.h"
 #include "MaxHeap.h"
+#include "HashMap.h"
 
 
 void test_Vector() {
@@ -353,6 +354,47 @@ void test_MaxHeap() {
     assert(heap.size() == 0);
 
     std::cout << "MaxHeap test passed.\n";
+}
+
+void test_HashMap() {
+    CoreDS::HashMap<std::string, int> map(8); // 初始化 8 个柜子
+
+    // 1. 测试基础存取
+    map.put("Apple", 10);
+    map.put("Banana", 20);
+    assert(map.get("Apple") == 10);
+    assert(map.get("Banana") == 20);
+    assert(map.size() == 2);
+
+    // 2. 测试键值覆盖 (改)
+    map.put("Apple", 99);
+    assert(map.get("Apple") == 99); // 苹果的价格必须被更新
+    assert(map.size() == 2);        // 总数不能变
+
+    // 3. 测试哈希冲突 (强制触发)
+    // 制造足够多的数据，必定会有分配到同一个柜子的，测试拉链法是否生效
+    map.put("Cat", 100);
+    map.put("Dog", 200);
+    map.put("Elephant", 300);
+    map.put("Fox", 400);
+    assert(map.size() == 6);
+    assert(map.get("Elephant") == 300);
+
+    // 4. 测试精准斩杀 (删)
+    map.remove("Banana");
+    assert(map.size() == 5);
+
+    // 5. 测试异常拦截
+    bool caught = false;
+    try {
+        map.get("Banana"); // 已经被删了，必须抛出异常
+    }
+    catch (const std::out_of_range&) {
+        caught = true;
+    }
+    assert(caught);
+
+    std::cout << "HashMap test passed! You are a Data Structure Master!" << std::endl;
 }
 
 int main() {
