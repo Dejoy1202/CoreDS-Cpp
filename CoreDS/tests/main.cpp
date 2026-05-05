@@ -1,6 +1,7 @@
 ﻿#include <iostream>
 #include <cassert>
 #include <stdexcept>
+#include<vector>
 #include "Vector.h"
 #include "LinkedList.h"
 #include "DoublyLinkedList.h"
@@ -8,6 +9,8 @@
 #include "LinkedStack.h"
 #include "LinkedQueue.h"
 #include "ArrayQueue.h"
+#include "BST.h"
+#include "MaxHeap.h"
 
 
 void test_Vector() {
@@ -45,7 +48,6 @@ void test_Vector() {
 
     std::cout << "Vector 所有核心功能与扩容机制单元测试通过！\n";
 }
-
 
 void test_LinkedList() {
     CoreDS::LinkedList<int> list;
@@ -261,13 +263,107 @@ void test_ArrayQueue() {
 
     std::cout << "ArrayQueue (动态环形数组队列) 测试完美通过!\n";
 }
+
+void test_BST() {
+    CoreDS::BST<int> tree;
+
+    // 1. 插入节点
+    tree.insert(50);
+    tree.insert(30);
+    tree.insert(70);
+    tree.insert(20);
+    tree.insert(40);
+    tree.insert(60);
+    tree.insert(80);
+    tree.insert(30); // 相等元素
+
+    // 2. 测试查找
+    assert(tree.contains(50));
+    assert(tree.contains(20));
+    assert(tree.contains(80));
+    assert(!tree.contains(99));
+
+    // 3. 迭代删除叶子节点 (20)
+    tree.remove(20);
+    assert(!tree.contains(20));
+    assert(tree.contains(30));
+
+    // 4. 迭代删除双孩子节点 (50)
+    tree.remove(50);
+    assert(!tree.contains(50));
+    assert(tree.contains(60)); // 确认替罪羊接管
+    assert(tree.contains(40)); // 确认左子树完好
+    assert(tree.contains(70)); // 确认右子树完好
+
+    // 5. 递归删除双孩子节点 (70)
+    tree.remove_recursive(70);
+    assert(!tree.contains(70));
+    assert(tree.contains(80)); // 确认子节点完好
+    assert(tree.contains(60));
+
+    std::cout << "BST test passed.\n";
+}
+
+void test_MaxHeap() {
+    // 1. 初始化极小容量 (2)，强制触发 reallocate 扩容测试
+    CoreDS::MaxHeap<int> heap(2);
+    assert(heap.empty());
+    assert(heap.size() == 0);
+
+    // 2. 测试空堆异常拦截
+    bool caught_top = false;
+    try { heap.top(); }
+    catch (const std::out_of_range&) { caught_top = true; }
+    assert(caught_top);
+
+    bool caught_pop = false;
+    try { heap.pop(); }
+    catch (const std::out_of_range&) { caught_pop = true; }
+    assert(caught_pop);
+
+    // 3. 基础插入与上浮测试
+    heap.insert(10);
+    assert(heap.top() == 10);
+
+    heap.insert(30);
+    assert(heap.top() == 30); // 30 必须上浮击败 10 成为榜一
+
+    heap.insert(20);
+    assert(heap.top() == 30); // 20 打不过 30，榜一不变
+
+    // 4. 大规模乱序插入测试
+    std::vector<int> nums = { 50, 15, 90, 80, 5, 100, 70 };
+    for (int num : nums) {
+        heap.insert(num);
+    }
+
+    // 此时堆内有 10 个元素，最大值必须是 100
+    assert(heap.size() == 10);
+    assert(heap.top() == 100);
+
+    // 5. 核心大考：连续 pop，验证下沉逻辑和严格递减
+    int expected[] = { 100, 90, 80, 70, 50, 30, 20, 15, 10, 5 };
+    for (int i = 0; i < 10; ++i) {
+        int val = heap.pop();
+        assert(val == expected[i]);
+    }
+
+    // 6. 验证彻底弹空后的状态
+    assert(heap.empty());
+    assert(heap.size() == 0);
+
+    std::cout << "MaxHeap test passed.\n";
+}
+
 int main() {
-    //test_Vector();
-    //test_LinkedList();
-    //test_DoublyLinkedList();
-    //test_ArrayStack();
-    //test_LinkedStack();
-    //test_LinkedQueue();
+    test_Vector();
+    test_LinkedList();
+    test_DoublyLinkedList();
+    test_ArrayStack();
+    test_LinkedStack();
+    test_LinkedQueue();
     test_ArrayQueue();
+    test_BST();
+    test_MaxHeap();
     return 0;
 }
